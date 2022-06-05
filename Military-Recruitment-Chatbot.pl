@@ -1,6 +1,5 @@
 :- use_module(library(jpl)).
-start :-sleep(0.4),	
-		write('Hello'),nl,
+start :-
         powitanie.
 
     cechy(Kandydat, narkotyki) :- verify(Kandydat, "Czy brales kiedykolwiek narkotyki?").
@@ -13,6 +12,10 @@ start :-sleep(0.4),
     cechy(Kandydat, zainteresowanie) :- verify(Kandydat, "Czy interesujesz sie szeroko pojeta militaryzacja?").
     cechy(Kandydat, powinnosc) :- verify(Kandydat, "Czy czujesz wewnetrzny obowiazek obrony swojego panstwa?").
     cechy(Kandydat, smierc) :- verify(Kandydat, "Czy jestes gotowy zginac za swoj kraj?").
+    cechy(Kandydat, psychika) :- verify(Kandydat, "Czy kiedykolwiek leczyles sie psychiatrycznie?").
+    cechy(Kandydat, psychika2) :- verify(Kandydat, "Czy masz lub miales stwierdzona chorobe psychiczna?").
+    cechy(Kandydat, jedzenie) :- verify(Kandydat, "Czy masz dobra tolerancje gastronomiczna?").
+    cechy(Kandydat, odpornosc) :- verify(Kandydat, "Czy posiadasz dobra odpornosc (chorowanie maksymalnie 2 razy do roku)?").
 
     wynik(Kandydat,idealny_zolnierz) :-
         cechy(Kandydat, kategorie),
@@ -39,35 +42,41 @@ start :-sleep(0.4),
         cechy(Kandydat, testf).
 
     wynik(Kandydat, nie_zolnierz) :-
-        cechy(Kandydat, narkotyki),
-        cechy(Kandydat, uzalezniony).
+        cechy(Kandydat, narkotyki);
+        cechy(Kandydat, uzalezniony);
+        cechy(Kandydat, psychika);
+        cechy(Kandydat, psychika2).
 
-    wynik(_,"Nie potrafimy podjac teraz deycji, potrzebne beda dodatkowe badania.").
+    wynik(Kandydat, ewentualnie) :-
+        cechy(Kandydat, jedzenie),
+        cechy(Kandydat, odpornosc).
+
+    wynik(_, inne).
+    
 
 kd(Kandydat):-
     wynik(Kandydat, Decyzja),
     koniec(Kandydat, Decyzja),
     write(Kandydat),write(Decyzja),undo.
 
-
 pytaj(Kandydat,Pytanie):-
     write(Kandydat),write(Pytanie),nl,
     wyswietl(Kandydat,Pytanie),
     write('Ladowanie...'),nl.
 
-:- dynamic yes/1,no/1.	
+:- dynamic tak/1,nie/1.	
 
 verify(K, P) :-
-    (yes(P) 
+    (tak(P) 
     -> 
     true ;
-    (no(P) 
+    (nie(P) 
     -> 
     fail ;
     pytaj(K, P))).
 
-undo :- retract(yes(_)),fail. 
-undo :- retract(no(_)),fail.
+undo :- retract(tak(_)),fail. 
+undo :- retract(nie(_)),fail.
 undo.
 
 powitanie :-
@@ -104,14 +113,13 @@ wyswietl(Kandydat, Pytanie) :-
 	jpl_call(F, setVisible, [@(true)], _),
 	jpl_call(F, toFront, [], _),
     jpl_new('javax.swing.JOptionPane', [], JOP),
-	jpl_call('javax.swing.JOptionPane', showInputDialog, [F,Atom], N),
+	jpl_call('javax.swing.JOptionPane', showConfirmDialog, [F,Atom], N),
 	jpl_call(F, dispose, [], _), 
     write(N),nl,
-	( (N == yes ; N == y)
+	( (N == 0)
       ->
-       assert(yes(Pytanie)) ;
-       assert(no(Pytanie)), fail).
-
+       assert(tak(Pytanie)) ;
+       assert(nie(Pytanie)), fail).
 
     
 koniec(Kandydat, Decyzja) :-
@@ -125,6 +133,18 @@ koniec(Kandydat, Decyzja) :-
 	jpl_call(F, setVisible, [@(true)], _),
 	jpl_call(F, toFront, [], _),
     jpl_new('javax.swing.JOptionPane', [], JOP),
-    atomic_list_concat([Kandydat,' twoj typ kandydata to: ',Decyzja], Atom),
-    jpl_call('javax.swing.JOptionPane', showMessageDialog, [F,Atom], _),
+
+    ((Decyzja == nie_zolnierz) ->
+        Decyzja2 = 'Przykro nam ale nie spelniasz podstawowych kryteriow. Nie mozesz przejsc dalej. Zostajesz odrzucony.'
+    ;(Decyzja == moze_zolnierz) ->
+        Decyzja2 = 'Niestety ale nie zakwalifikowales sie w pierwszej turze ale wciaz nasz szanse w drugiej.'
+    ;(Decyzja == dobry_zolnierz; Decyzja == idealny_zolnierz) ->
+        Decyzja2 = 'Gratulacje! Idealnie nadajesz sie na zolnierza. Na pewno sie do Ciebie odezwiemy.'
+    ;(Decyzja == inne) ->
+        Decyzja2 = 'Niestety zostales odrzucony. Nie pasujesz do schematu zolnierza. Pamietaj takze, ze wyrazenie zgody na testy jest obowiazkowe by przejsc dalej.'
+    ;(Decyzja == ewentualnie) ->
+        Decyzja2 = 'Nie moglismy dopasowac twoich odpowiedzi do naszych wymagan dlatego zostaly Ci zadane dodatkowe pytania. Z twoich odpowiedzi wynika, ze zostaniesz powolany tylko w przypadku braku personelu.'
+    ),
+   
+    jpl_call('javax.swing.JOptionPane', showMessageDialog, [F,Decyzja2], _),
     jpl_call(F, dispose, [], _).
