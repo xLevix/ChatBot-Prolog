@@ -79,60 +79,60 @@ zmien :- retract(nie(_)),fail.
 zmien.
 
 powitanie :-
-    jpl_new('javax.swing.JFrame', ['Chatbot'], F),
-    jpl_new('javax.swing.JLabel',['Rozmowa na stanowisko wojskowe'],LBL),
+    jpl_new('javax.swing.JFrame', ['Chatbot'], Frame),
+    jpl_new('javax.swing.JLabel',['Rozmowa na stanowisko wojskowe'],Label),
     jpl_new('javax.swing.JPanel',[],Pan),
-    jpl_call(Pan,add,[LBL],_),
-    jpl_call(F,add,[Pan],_),
-    jpl_call(F, setLocation, [200,50], _),
-    jpl_call(F, setSize, [800,700], _),
-    jpl_call(F, setVisible, [@(true)], _),
-    jpl_call(F, toFront, [], _),
+    jpl_call(Pan,add,[Label],_),
+    jpl_call(Frame,add,[Pan],_),
+    jpl_call(Frame, setLocation, [200,50], _),
+    jpl_call(Frame, setSize, [800,700], _),
+    jpl_call(Frame, setVisible, [@(true)], _),
+    jpl_call(Frame, toFront, [], _),
     jpl_new('javax.swing.JOptionPane', [], JOP),
-    jpl_call('javax.swing.JOptionPane', showInputDialog, [F,'Prosze podaj swoje imie'], N),
-    atomic_list_concat(['Witaj ', N ,' w elektronicznym systemie rekrutacji wojskowej. Zadamy Ci pare pytan, prosze odpowiadaj szczerze. '], Witaj),
-    jpl_call(JOP, showMessageDialog, [F, Witaj], _),
-    jpl_call(F, dispose, [], _), 
+    jpl_call('javax.swing.JOptionPane', showInputDialog, [Frame,'Prosze podaj swoje imie'], Anserw),
+    atomic_list_concat(['Witaj ', Anserw ,' w elektronicznym systemie rekrutacji wojskowej. Zadamy Ci pare pytan, prosze odpowiadaj szczerze. '], Witaj),
+    jpl_call(JOP, showMessageDialog, [Frame, Witaj], _),
+    jpl_call(Frame, dispose, [], _), 
 
-    (N == @(null) ->	
+    (Anserw == @(null) ->	
         write('Przerwano'),
         fail
     ;	
-        kd(N)
+        kd(Anserw)
     ).
 
 
 wyswietl(Kandydat, Pytanie) :-
     atomic_list_concat([Kandydat,' ',Pytanie], Atom),
-    jpl_new('javax.swing.JFrame', ['Chatbot'], F),
-    jpl_new('javax.swing.JLabel',['Rozmowa na stanowisko wojskowe'],LBL),
+    jpl_new('javax.swing.JFrame', ['Chatbot'], Frame),
+    jpl_new('javax.swing.JLabel',['Rozmowa na stanowisko wojskowe'],Label),
     jpl_new('javax.swing.JPanel',[],Pan),
-	jpl_call(Pan,add,[LBL],_),
-	jpl_call(F,add,[Pan],_),
-	jpl_call(F, setLocation, [200,50], _),
-	jpl_call(F, setSize, [800,700], _),
-	jpl_call(F, setVisible, [@(true)], _),
-	jpl_call(F, toFront, [], _),
+	jpl_call(Pan,add,[Label],_),
+	jpl_call(Frame,add,[Pan],_),
+	jpl_call(Frame, setLocation, [200,50], _),
+	jpl_call(Frame, setSize, [800,700], _),
+	jpl_call(Frame, setVisible, [@(true)], _),
+	jpl_call(Frame, toFront, [], _),
     jpl_new('javax.swing.JOptionPane', [], JOP),
-	jpl_call('javax.swing.JOptionPane', showConfirmDialog, [F,Atom], N),
-	jpl_call(F, dispose, [], _), 
-    write(N),nl,
-	((N == 0) ->
+	jpl_call('javax.swing.JOptionPane', showConfirmDialog, [Frame,Atom], Anserw),
+	jpl_call(Frame, dispose, [], _), 
+    
+	((Anserw == 0) ->
        assert(tak(Pytanie)) 
     ;
        assert(nie(Pytanie)), fail).
 
     
 koniec(Kandydat, Decyzja) :-
-    jpl_new('javax.swing.JFrame', ['Chatbot'], F),
-    jpl_new('javax.swing.JLabel',['Rozmowa na stanowisko wojskowe'],LBL),
+    jpl_new('javax.swing.JFrame', ['Chatbot'], Frame),
+    jpl_new('javax.swing.JLabel',['Rozmowa na stanowisko wojskowe'],Label),
     jpl_new('javax.swing.JPanel',[],Pan),
-	jpl_call(Pan,add,[LBL],_),
-	jpl_call(F,add,[Pan],_),
-	jpl_call(F, setLocation, [200,50], _),
-	jpl_call(F, setSize, [800,700], _),
-	jpl_call(F, setVisible, [@(true)], _),
-	jpl_call(F, toFront, [], _),
+	jpl_call(Pan,add,[Label],_),
+	jpl_call(Frame,add,[Pan],_),
+	jpl_call(Frame, setLocation, [200,50], _),
+	jpl_call(Frame, setSize, [800,700], _),
+	jpl_call(Frame, setVisible, [@(true)], _),
+	jpl_call(Frame, toFront, [], _),
     jpl_new('javax.swing.JOptionPane', [], JOP),
 
     ((Decyzja == nie_zolnierz) ->
@@ -147,5 +147,5 @@ koniec(Kandydat, Decyzja) :-
         Decyzja2 = 'Nie moglismy dopasowac twoich odpowiedzi do naszych wymagan dlatego zostaly Ci zadane dodatkowe pytania. Z twoich odpowiedzi wynika, ze zostaniesz powolany tylko w przypadku braku personelu.'
     ),
    
-    jpl_call('javax.swing.JOptionPane', showMessageDialog, [F,Decyzja2], _),
-    jpl_call(F, dispose, [], _).
+    jpl_call('javax.swing.JOptionPane', showMessageDialog, [Frame,Decyzja2], _),
+    jpl_call(Frame, dispose, [], _).
