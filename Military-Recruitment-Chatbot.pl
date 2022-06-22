@@ -1,21 +1,21 @@
 :- use_module(library(jpl)).
-start :-
+startuj :-
         powitanie.
 
-    cechy(Kandydat, narkotyki) :- verify(Kandydat, "Czy brales kiedykolwiek narkotyki?").
-    cechy(Kandydat, uzalezniony) :- verify(Kandydat, "Czy byles lub nadal jestes od czegos uzalezniony?").
-    cechy(Kandydat, kategorie) :- verify(Kandydat, "Czy masz kategorie wojskowa A?").
-    cechy(Kandydat, wiek) :- verify(Kandydat, "Czy masz wiecej niz 18 lat?").
-    cechy(Kandydat, testp) :- verify(Kandydat, "Czy wyrazasz zgode na przeprowadzenie testu psychologicznego?").
-    cechy(Kandydat, testf) :- verify(Kandydat, "Czy zgadzasz sie na przeprowadzenie testu sprawnosciowego?").
-    cechy(Kandydat, patriota) :- verify(Kandydat, "Czy jestes patriota?").
-    cechy(Kandydat, zainteresowanie) :- verify(Kandydat, "Czy interesujesz sie szeroko pojeta militaryzacja?").
-    cechy(Kandydat, powinnosc) :- verify(Kandydat, "Czy czujesz wewnetrzny obowiazek obrony swojego panstwa?").
-    cechy(Kandydat, smierc) :- verify(Kandydat, "Czy jestes gotowy zginac za swoj kraj?").
-    cechy(Kandydat, psychika) :- verify(Kandydat, "Czy kiedykolwiek leczyles sie psychiatrycznie?").
-    cechy(Kandydat, psychika2) :- verify(Kandydat, "Czy masz lub miales stwierdzona chorobe psychiczna?").
-    cechy(Kandydat, jedzenie) :- verify(Kandydat, "Czy masz dobra tolerancje gastronomiczna?").
-    cechy(Kandydat, odpornosc) :- verify(Kandydat, "Czy posiadasz dobra odpornosc (chorowanie maksymalnie 2 razy do roku)?").
+    cechy(Kandydat, narkotyki) :- zapytaj(Kandydat, "Czy brales kiedykolwiek narkotyki?").
+    cechy(Kandydat, uzalezniony) :- zapytaj(Kandydat, "Czy byles lub nadal jestes od czegos uzalezniony?").
+    cechy(Kandydat, kategorie) :- zapytaj(Kandydat, "Czy masz kategorie wojskowa A?").
+    cechy(Kandydat, wiek) :- zapytaj(Kandydat, "Czy masz wiecej niz 18 lat?").
+    cechy(Kandydat, testp) :- zapytaj(Kandydat, "Czy wyrazasz zgode na przeprowadzenie testu psychologicznego?").
+    cechy(Kandydat, testf) :- zapytaj(Kandydat, "Czy zgadzasz sie na przeprowadzenie testu sprawnosciowego?").
+    cechy(Kandydat, patriota) :- zapytaj(Kandydat, "Czy jestes patriota?").
+    cechy(Kandydat, zainteresowanie) :- zapytaj(Kandydat, "Czy interesujesz sie szeroko pojeta militaryzacja?").
+    cechy(Kandydat, powinnosc) :- zapytaj(Kandydat, "Czy czujesz wewnetrzny obowiazek obrony swojego panstwa?").
+    cechy(Kandydat, smierc) :- zapytaj(Kandydat, "Czy jestes gotowy zginac za swoj kraj?").
+    cechy(Kandydat, psychika) :- zapytaj(Kandydat, "Czy kiedykolwiek leczyles sie psychiatrycznie?").
+    cechy(Kandydat, psychika2) :- zapytaj(Kandydat, "Czy masz lub miales stwierdzona chorobe psychiczna?").
+    cechy(Kandydat, jedzenie) :- zapytaj(Kandydat, "Czy masz dobra tolerancje gastronomiczna?").
+    cechy(Kandydat, odpornosc) :- zapytaj(Kandydat, "Czy posiadasz dobra odpornosc (chorowanie maksymalnie 2 razy do roku)?").
 
     wynik(Kandydat,idealny_zolnierz) :-
         cechy(Kandydat, kategorie),
@@ -57,27 +57,26 @@ start :-
 kd(Kandydat):-
     wynik(Kandydat, Decyzja),
     koniec(Kandydat, Decyzja),
-    write(Kandydat),write(Decyzja),undo.
+    zmien.
 
 pytaj(Kandydat,Pytanie):-
-    write(Kandydat),write(Pytanie),nl,
-    wyswietl(Kandydat,Pytanie),
-    write('Ladowanie...'),nl.
+    wyswietl(Kandydat,Pytanie).
 
-:- dynamic tak/1,nie/1.	
+:- dynamic tak/1, nie/1.	
 
-verify(K, P) :-
-    (tak(P) 
-    -> 
-    true ;
-    (nie(P) 
-    -> 
-    fail ;
-    pytaj(K, P))).
+zapytaj(K, P) :-
+    (tak(P) -> 
+        true 
+    ;
+    (nie(P) -> 
+        fail 
+    ;
+        pytaj(K, P))
+    ).
 
-undo :- retract(tak(_)),fail. 
-undo :- retract(nie(_)),fail.
-undo.
+zmien :- retract(tak(_)),fail. 
+zmien :- retract(nie(_)),fail.
+zmien.
 
 powitanie :-
     jpl_new('javax.swing.JFrame', ['Chatbot'], F),
@@ -95,9 +94,11 @@ powitanie :-
     jpl_call(JOP, showMessageDialog, [F, Witaj], _),
     jpl_call(F, dispose, [], _), 
 
-    (	N == @(null)
-        ->	write('Przerwano'),fail
-        ;	write(N),nl,kd(N)
+    (N == @(null) ->	
+        write('Przerwano'),
+        fail
+    ;	
+        kd(N)
     ).
 
 
@@ -116,9 +117,9 @@ wyswietl(Kandydat, Pytanie) :-
 	jpl_call('javax.swing.JOptionPane', showConfirmDialog, [F,Atom], N),
 	jpl_call(F, dispose, [], _), 
     write(N),nl,
-	( (N == 0)
-      ->
-       assert(tak(Pytanie)) ;
+	((N == 0) ->
+       assert(tak(Pytanie)) 
+    ;
        assert(nie(Pytanie)), fail).
 
     
